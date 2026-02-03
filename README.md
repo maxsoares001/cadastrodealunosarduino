@@ -1,6 +1,7 @@
 # 🏋️ Sistema de Academia RFID com Google Sheets
 
-Sistema completo de controle de acesso usando Arduino, RFID e Planilhas Google para registro de entrada e saída.
+Sistema completo de controle de acesso usando Arduino, RFID e Planilhas Google para registro de entrada e saída, esse sistema foi feito para 
+uma pequena academia de bairro que precisava de um sistema assim, de controle.
 
 ## 🚀 Funcionalidades
 - Cadastro de novos alunos via Web Serial API.
