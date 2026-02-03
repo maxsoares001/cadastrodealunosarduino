@@ -27,6 +27,39 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
 - **Banco de Dados:** Google Sheets.
 - **Firmware:** C++ (Arduino IDE).
 
+
+## 🛠️ Montagem dos Jampers no Arduino
+```
+| RC522 | Arduino UNO      |
+| ----- | ---------------- |
+| SDA   | D10              |
+| SCK   | D13              |
+| MOSI  | D11              |
+| MISO  | D12              |
+| IRQ   | não usa          |
+| GND   | GND              |
+| RST   | D9               |
+| 3.3V  | 3.3V ⚠️ (NÃO 5V) |
+
+
+
+| LCD | Arduino |
+| --- | ------- |
+| GND | GND     |
+| VCC | 5V      |
+| SDA | A4      |
+| SCL | A5      |
+
+
+Bibliotecas que foram necessário baixar dentro do Arduino, foram essas aqui:
+
+MFRC522
+LiquidCrystal_I2C
+
+que são as bibliotecas do modulo do display e a do modulo do RFID
+```
+
+
 ### 🤖 Código HTML do projeto
 ```html
 // Cole seu código HTML aqui
@@ -484,4 +517,85 @@ void loop() {
   rfid.PCD_StopCrypto1();
 }
 ```
+### 🤖 Código do Script
+```gs
+function doPost(e) {
+  // Garante que o cadastro vá para a aba "Alunos"
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Alunos");
+  var data = JSON.parse(e.postData.contents);
 
+  sheet.appendRow([
+    data.uid,
+    data.nome,
+    data.cidade,
+    data.bairro,
+    data.peso,
+    data.modalidade,
+    data.horario,
+    data.foto,
+    new Date() // Data do cadastro
+  ]);
+
+  return ContentService.createTextOutput("OK");
+}
+
+function doGet(e) {
+  var uidProcurado = e.parameter.uid;
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheetAlunos = ss.getSheetByName("Alunos");
+  var sheetFreq = ss.getSheetByName("Frequencia");
+  
+  var dataAlunos = sheetAlunos.getDataRange().getValues();
+  var alunoNome = "";
+  
+  // 1. Procura o ID na aba Alunos para validar o cadastro
+  for (var i = 0; i < dataAlunos.length; i++) {
+    if (dataAlunos[i][0].toString() == uidProcurado.toString()) {
+      alunoNome = dataAlunos[i][1];
+      break;
+    }
+  }
+  
+  // Se o aluno existe, gerencia a frequência
+  if (alunoNome !== "") {
+    var dataFreq = sheetFreq.getDataRange().getValues();
+    var dataHoje = new Date().toLocaleDateString();
+    var horaAgora = Utilities.formatDate(new Date(), "GMT-3", "HH:mm:ss");
+    var linhaParaSair = -1;
+
+    // Busca se existe uma entrada hoje sem horário de saída (coluna E vazia)
+    for (var j = dataFreq.length - 1; j >= 1; j--) {
+      var dataLinha = new Date(dataFreq[j][2]).toLocaleDateString();
+      if (dataFreq[j][0].toString() == uidProcurado.toString() && dataLinha == dataHoje) {
+        if (dataFreq[j][4] === "") { // Coluna E (Saída) está vazia
+          linhaParaSair = j + 1;
+        }
+        break; 
+      }
+    }
+
+    var statusFinal = "";
+    if (linhaParaSair == -1) {
+      // REGISTRA ENTRADA
+      sheetFreq.appendRow([uidProcurado, alunoNome, new Date(), horaAgora, ""]);
+      statusFinal = "ON";
+    } else {
+      // REGISTRA SAÍDA na coluna 5 (E)
+      sheetFreq.getRange(linhaParaSair, 5).setValue(horaAgora);
+      statusFinal = "OFF";
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({
+      encontrado: true,
+      nome: alunoNome,
+      status: statusFinal
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  // Se não achar, avisa que a tag é nova
+  return ContentService.createTextOutput(JSON.stringify({encontrado: false}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+```
