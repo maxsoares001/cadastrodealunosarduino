@@ -14,6 +14,11 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
   <img src="docs/Imagemreal.jpeg" width="50%">
 </p>
 
+Obs.: Quando for criar a planilha no google sheet, observe no código HTML aqui em baixo quais os nomes vc vai colocar, caso queira
+colocar do jeito que vc quiser, é só mudar a parte dos nomes das colunas no código e pronto.
+
+
+
 ## 🛠️ Hardware Utilizado
 - Arduino Uno
 - Leitor RFID RC522
