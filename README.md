@@ -378,4 +378,108 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
 </html>
 
 
+### 🤖 Código do Arduino
+```c++
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
+#define SS_PIN 10
+#define RST_PIN 9
+#define BUZZER_PIN 8 
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  rfid.PCD_Init();
+  pinMode(BUZZER_PIN, OUTPUT); 
+
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("Aproxime a tag");
+}
+
+void loop() {
+  // VERIFICA SE O PC MANDOU DADOS (VINDO DO HTML)
+  if (Serial.available() > 0) {
+    String mensagem = Serial.readStringUntil('\n');
+    mensagem.trim();
+
+    lcd.clear();
+    
+    // VERIFICA SE A MENSAGEM É DE CADASTRO NOVO
+    if (mensagem == "CADASTRO OK") {
+      lcd.setCursor(0, 0);
+      lcd.print("ALUNO SALVO!");
+      lcd.setCursor(0, 1);
+      lcd.print("COM SUCESSO!");
+
+      // Som de sucesso (3 bips rápidos)
+      for(int i=0; i<3; i++){
+        tone(BUZZER_PIN, 3000); delay(70); noTone(BUZZER_PIN); delay(50);
+      }
+    } 
+    // LÓGICA DE ENTRADA (ON) E SAÍDA (OFF)
+    else {
+      int divisor = mensagem.indexOf('|');
+      if (divisor != -1) {
+        String nome = mensagem.substring(0, divisor);
+        String status = mensagem.substring(divisor + 1);
+
+        lcd.setCursor(0, 0);
+        lcd.print(nome.substring(0, 16));
+        lcd.setCursor(0, 1);
+        lcd.print("STATUS: ");
+        lcd.print(status); 
+
+        // Sons diferentes para Entrada e Saída
+        if(status == "ON") {
+          // Bip duplo agudo para ENTRADA
+          tone(BUZZER_PIN, 2500); delay(100); noTone(BUZZER_PIN); delay(50);
+          tone(BUZZER_PIN, 2500); delay(100); noTone(BUZZER_PIN);
+        } else {
+          // Bip longo mais grave para SAÍDA
+          tone(BUZZER_PIN, 1500); delay(400); noTone(BUZZER_PIN);
+        }
+      } else {
+        // Caso receba apenas o nome (fallback)
+        lcd.setCursor(0, 0);
+        lcd.print("BEM-VINDO:");
+        lcd.setCursor(0, 1);
+        lcd.print(mensagem.substring(0, 16));
+      }
+    }
+
+    delay(3000); // Fica 3 segundos na tela
+    lcd.clear();
+    lcd.print("Aproxime a tag");
+  }
+
+  // LÓGICA NORMAL DE LEITURA DA TAG (RFID)
+  if (!rfid.PICC_IsNewCardPresent()) return;
+  if (!rfid.PICC_ReadCardSerial()) return;
+
+  String uid = "";
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    uid += String(rfid.uid.uidByte[i], HEX);
+  }
+  uid.toUpperCase();
+
+  // Bip curto indicando que a tag foi lida
+  tone(BUZZER_PIN, 2000); delay(100); noTone(BUZZER_PIN);
+
+  Serial.println(uid); // Envia o ID para o HTML consultar
+
+  lcd.clear();
+  lcd.print("VERIFICANDO...");
+  lcd.setCursor(0,1);
+  lcd.print(uid);
+  
+  rfid.PICC_HaltA();
+  rfid.PCD_StopCrypto1();
+}
