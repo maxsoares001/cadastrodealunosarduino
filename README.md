@@ -67,7 +67,6 @@ que são as bibliotecas do modulo do display e a do modulo do RFID
 
 ### 🤖 Código HTML do projeto
 ```html
-// Cole seu código HTML aqui
 <!DOCTYPE html>
 <!-- Define que é um documento HTML5 -->
 
