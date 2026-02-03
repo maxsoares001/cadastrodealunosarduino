@@ -31,39 +31,151 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
 ```html
 // Cole seu código HTML aqui
 <!DOCTYPE html>
+<!-- Define que é um documento HTML5 -->
+
 <html lang="pt-br">
+<!-- Idioma da página: português do Brasil -->
+
 <head>
     <meta charset="UTF-8">
-    <title>Sistema Academia - Cadastro RFID</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background-color: #f4f7f6; }
-        .container { max-width: 500px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: auto; }
-        h2 { color: #333; text-align: center; }
-        label { font-weight: bold; font-size: 0.9em; color: #555; }
-        input { margin-bottom: 15px; padding: 12px; width: calc(100% - 26px); border: 1px solid #ddd; border-radius: 5px; display: block; font-size: 1em; }
-        button { width: 100%; padding: 12px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-        .btn-connect { background-color: #007bff; color: white; margin-bottom: 20px; }
-        .btn-save { background-color: #28a745; color: white; font-size: 1.1em; }
-        #status { text-align: center; font-size: 0.85em; margin-bottom: 20px; color: #666; }
+    <!-- Permite acentos, ç, etc -->
 
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 400px; width: 80%; animation: popup 0.3s ease-out; }
-        @keyframes popup { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    <title>Sistema Academia - Cadastro RFID</title>
+    <!-- Título que aparece na aba do navegador -->
+
+    <style>
+        /* ===== ESTILOS GERAIS DA PÁGINA ===== */
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 30px;
+            background-color: #f4f7f6;
+        }
+
+        /* Caixa principal centralizada */
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        /* Campos de texto */
+        input {
+            margin-bottom: 15px;
+            padding: 12px;
+            width: calc(100% - 26px);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: block;
+            font-size: 1em;
+        }
+
+        /* Botões padrão */
+        button {
+            width: 100%;
+            padding: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* Botão conectar Arduino */
+        .btn-connect {
+            background-color: #007bff;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        /* Botão salvar */
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        /* Texto de status da conexão */
+        #status {
+            text-align: center;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        /* ===== MODAL (POPUP) ===== */
+
+        .modal {
+            display: none; /* começa escondido */
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 80%;
+            animation: popup 0.3s ease-out;
+        }
+
+        /* Animação de abrir popup */
+        @keyframes popup {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         .icon-sucesso { color: #28a745; font-size: 50px; }
         .icon-aviso { color: #ff9800; font-size: 50px; }
     </style>
 </head>
+
 <body>
 
+<!-- ===== FORMULÁRIO PRINCIPAL ===== -->
 <div class="container">
+
     <h2>Cadastro de Aluno</h2>
-    <button class="btn-connect" onclick="conectarSerial()">1. Conectar Arduino (USB)</button>
+
+    <!-- Botão que conecta com o Arduino via USB -->
+    <button class="btn-connect" onclick="conectarSerial()">
+        1. Conectar Arduino (USB)
+    </button>
+
+    <!-- Mostra o status da conexão -->
     <div id="status">Status: Desconectado</div>
 
     <hr>
+
+    <!-- Campo onde aparece o UID da tag -->
     <label>ID da Tag:</label>
-    <input id="uid" placeholder="Aproxime a tag..." readonly style="background: #f9f9f9; border-color: #007bff;">
-    
+    <input id="uid" placeholder="Aproxime a tag..." readonly
+           style="background: #f9f9f9; border-color: #007bff;">
+
+    <!-- Dados do aluno -->
     <input id="nome" placeholder="Nome Completo">
     <input id="cidade" placeholder="Cidade">
     <input id="bairro" placeholder="Bairro">
@@ -72,9 +184,14 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
     <input id="horario" placeholder="Horário">
     <input id="foto" placeholder="URL da foto">
 
-    <button class="btn-save" onclick="enviar()">2. Salvar na Planilha</button>
+    <!-- Botão salvar -->
+    <button class="btn-save" onclick="enviar()">
+        2. Salvar na Planilha
+    </button>
 </div>
 
+
+<!-- ===== POPUP ===== -->
 <div id="meuModal" class="modal">
     <div class="modal-content">
         <div id="modalIcon"></div>
@@ -83,126 +200,182 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
     </div>
 </div>
 
+
 <script>
-    const urlPlanilha = "URL DO SCRIPT"; 
+    // URL do Google Apps Script (planilha)
+    const urlPlanilha = "URL DO SCRIPT";
+
+    // Porta serial do Arduino
     let port;
+
+    // Controla o loop de leitura
     let keepReading = true;
 
+
+
+    // ===== CONECTA AO ARDUINO =====
     async function conectarSerial() {
+
+        // Só funciona no Chrome/Edge
         if (!("serial" in navigator)) return alert("Use o Chrome!");
+
         try {
+            // usuário escolhe a porta USB
             port = await navigator.serial.requestPort();
+
+            // abre a comunicação em 9600 (igual Arduino)
             await port.open({ baudRate: 9600 });
+
+            // atualiza status
             document.getElementById('status').innerText = "Status: Conectado! Aproxime a tag.";
             document.getElementById('status').style.color = "green";
+
             keepReading = true;
+
+            // começa a ler os dados
             lerDados();
-        } catch (e) { alert("Erro ao abrir porta: " + e); }
+
+        } catch (e) {
+            alert("Erro ao abrir porta: " + e);
+        }
     }
 
+
+
+    // ===== LÊ OS DADOS QUE VÊM DO ARDUINO =====
     async function lerDados() {
+
+        // enquanto tiver porta ativa
         while (port.readable && keepReading) {
+
             const decoder = new TextDecoderStream();
             const readableStreamClosed = port.readable.pipeTo(decoder.writable);
             const reader = decoder.readable.getReader();
+
             let buffer = "";
 
             try {
                 while (true) {
                     const { value, done } = await reader.read();
                     if (done) break;
+
                     buffer += value;
 
+                    // quando Arduino manda \n = fim da leitura
                     if (buffer.includes("\n") || buffer.includes("\r")) {
+
                         let idLido = buffer.trim();
+
                         if (idLido.length >= 4) {
                             document.getElementById('uid').value = idLido;
+
+                            // verifica se já existe na planilha
                             verificarExistencia(idLido);
                         }
-                        buffer = ""; 
+
+                        buffer = "";
                     }
                 }
-            } catch (error) {
-                console.error("Erro na leitura:", error);
+
             } finally {
                 reader.releaseLock();
                 await readableStreamClosed.catch(() => {});
             }
+
             await new Promise(resolve => setTimeout(resolve, 100));
         }
     }
 
-    // --- FUNÇÃO ATUALIZADA PARA ENVIAR NOME E STATUS (ON/OFF) ---
+
+
+    // ===== VERIFICA SE TAG JÁ EXISTE =====
     async function verificarExistencia(uid) {
-        try {
-            const res = await fetch(`${urlPlanilha}?uid=${uid}`);
-            const data = await res.json();
-            if (data.encontrado) {
-                // Mostra popup com o status (Entrada ou Saída)
-                mostrarPopup("aviso", data.nome, "Status: " + data.status);
-                document.getElementById('nome').value = data.nome;
 
-                // Envia "Nome|Status" para o Arduino (Ex: "Joao|ON")
-                if (port && port.writable) {
-                    const encoder = new TextEncoder();
-                    const writer = port.writable.getWriter();
-                    await writer.write(encoder.encode(data.nome + "|" + data.status + "\n"));
-                    writer.releaseLock();
-                }
-                
-                setTimeout(() => { 
-                    fecharPopup(); 
-                    limparTudo(); 
-                }, 4000);
-            }
-        } catch (e) { console.log("Erro na verificação."); }
-    }
+        const res = await fetch(`${urlPlanilha}?uid=${uid}`);
+        const data = await res.json();
 
-    function enviar() {
-        let uid = document.getElementById('uid').value;
-        let nome = document.getElementById('nome').value;
-        if (!uid || !nome) return alert("Falta o ID ou o Nome!");
+        if (data.encontrado) {
 
-        let dados = {
-            uid: uid, nome: nome,
-            cidade: document.getElementById('cidade').value,
-            bairro: document.getElementById('bairro').value,
-            peso: document.getElementById('peso').value,
-            modalidade: document.getElementById('modalidade').value,
-            horario: document.getElementById('horario').value,
-            foto: document.getElementById('foto').value
-        };
+            // mostra popup
+            mostrarPopup("aviso", data.nome, "Status: " + data.status);
 
-        fetch(urlPlanilha, { method: "POST", mode: "no-cors", body: JSON.stringify(dados) })
-        .then(async () => {
-            mostrarPopup("sucesso", "Sucesso!", "Cadastrado na planilha!");
+            document.getElementById('nome').value = data.nome;
 
+            // envia info de volta ao Arduino
             if (port && port.writable) {
                 const encoder = new TextEncoder();
                 const writer = port.writable.getWriter();
-                await writer.write(encoder.encode("CADASTRO OK\n"));
+                await writer.write(encoder.encode(data.nome + "|" + data.status + "\n"));
                 writer.releaseLock();
             }
 
-            limparTudo();
-            setTimeout(fecharPopup, 3000);
-        });
+            setTimeout(() => {
+                fecharPopup();
+                limparTudo();
+            }, 4000);
+        }
     }
 
+
+
+    // ===== ENVIA CADASTRO PARA PLANILHA =====
+    function enviar() {
+
+        let uid = document.getElementById('uid').value;
+        let nome = document.getElementById('nome').value;
+
+        if (!uid || !nome) return alert("Falta o ID ou o Nome!");
+
+        let dados = {
+            uid: uid,
+            nome: nome,
+            cidade: cidade.value,
+            bairro: bairro.value,
+            peso: peso.value,
+            modalidade: modalidade.value,
+            horario: horario.value,
+            foto: foto.value
+        };
+
+        fetch(urlPlanilha, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(dados)
+        });
+
+        mostrarPopup("sucesso", "Sucesso!", "Cadastrado na planilha!");
+    }
+
+
+
+    // ===== POPUP =====
     function mostrarPopup(tipo, tit, txt) {
+
         const icon = document.getElementById('modalIcon');
+
         icon.innerHTML = tipo === "sucesso" ? "✅" : "⚠️";
         icon.className = tipo === "sucesso" ? "icon-sucesso" : "icon-aviso";
-        document.getElementById('modalTitulo').innerText = tit;
-        document.getElementById('modalTexto').innerText = txt;
+
+        modalTitulo.innerText = tit;
+        modalTexto.innerText = txt;
+
         document.getElementById('meuModal').style.display = "flex";
     }
 
-    function fecharPopup() { document.getElementById('meuModal').style.display = "none"; }
-    
+    function fecharPopup() {
+        document.getElementById('meuModal').style.display = "none";
+    }
+
+
+
+    // ===== LIMPA TODOS OS CAMPOS =====
     function limparTudo() {
         document.querySelectorAll('input').forEach(i => i.value = "");
     }
+
 </script>
 </body>
 </html>
+
+
+
