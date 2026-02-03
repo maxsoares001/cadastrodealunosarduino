@@ -8,16 +8,15 @@ Sistema completo de controle de acesso usando Arduino, RFID e Planilhas Google p
 - Feedback em tempo real no Display LCD e Buzzer.
 - Cálculo de estatísticas de presença.
 
-## 📸 Demonstração
-![Foto do Projeto](docs/Imagemreal.jpeg)
-*(Suba sua foto na pasta docs e coloque o nome dela aqui)*
+## 📸 Imagem real do projeto
+<img src="docs/Imagenreal.jpeg" width="300">
 
 ## 🛠️ Hardware Utilizado
 - Arduino Uno
 - Leitor RFID RC522
 - Display LCD 16x2 com I2C
-- Buzzer Ativo
-- Protoboard e Jumpers
+- Buzzer Ativo (aqueles de pcs mesmo)
+- Jumpers
 
 ## 💻 Tecnologias
 - **Frontend:** HTML5, CSS3, JavaScript (Web Serial API).
