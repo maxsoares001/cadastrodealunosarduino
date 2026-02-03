@@ -376,10 +376,10 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
 </script>
 </body>
 </html>
-
+```
 
 ### 🤖 Código do Arduino
-```c++
+```cpp
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Wire.h>
@@ -483,3 +483,5 @@ void loop() {
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
 }
+```
+
