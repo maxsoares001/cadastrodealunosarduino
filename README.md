@@ -9,8 +9,8 @@ Sistema completo de controle de acesso usando Arduino, RFID e Planilhas Google p
 - Cálculo de estatísticas de presença.
 
 ## 📸 Imagem real do projeto
-<p align="center">
-  <img src="docs/Imagemreal.jpeg" width="400">
+<p align="left">
+  <img src="docs/Imagemreal.jpeg" width="50%">
 </p>
 
 ## 🛠️ Hardware Utilizado
