@@ -27,7 +27,7 @@ uma pequena academia de bairro que precisava de um sistema assim, de controle.
 - **Banco de Dados:** Google Sheets.
 - **Firmware:** C++ (Arduino IDE).
 
-### 🤖 Código do Arduino (Firmware)
+### 🤖 Código HTML do projeto
 ```html
 // Cole seu código HTML aqui
 <!DOCTYPE html>
